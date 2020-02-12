@@ -12,7 +12,7 @@ class UserController extends Controller
     private $successStatus  =   200;
  
     //----------------- [ Register user ] -------------------
-    public function registerUser(Request $request) 
+    public function userRegister(Request $request) 
     {
  
         $validator  =   Validator::make($request->all(),
@@ -37,7 +37,7 @@ class UserController extends Controller
         );
  
         // check if email already registered
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->usuario)->first();
         if(!is_null($user)) {
             $data['message'] = "El usuario ya se encuentra registrado.";
             return response()->json(['success' => false, 'status' => 'failed', 'data' => $data]);

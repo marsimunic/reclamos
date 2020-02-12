@@ -25,7 +25,7 @@ Route::group(['middleware' => 'auth:api'], function(){
 });*/
 
 Route::group([
-    'prefix' => 'auth'
+    'prefix' => 'epre'
 ], function () {
 	//Route::post('login', [ 'as' => 'login', 'uses' => 'Api\UserController@userLogin']);
     Route::post('login', 'Api\UserController@userLogin');
