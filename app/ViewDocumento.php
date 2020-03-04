@@ -8,7 +8,7 @@ class ViewDocumento extends Model
 {
     // 
     protected $connection = 'oracle';
-    protected $table = 'SISTRANS.V_EPRE_CANAL_REC_ABIERTOS_DOC';
+    protected $table = 'sistrans.V_EPRE_CANAL_REC_ABIERTOS_DOC';
     //protected $primaryKey = 'documento';
     //protected $fillable = ['documento'];
      //

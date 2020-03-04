@@ -28,13 +28,13 @@ Route::group([
     'prefix' => 'epre'
 ], function () {
 	//Route::post('login', [ 'as' => 'login', 'uses' => 'Api\UserController@userLogin']);
-    Route::post('login', 'Api\UserController@userLogin');
+    Route::post('token', 'Api\UserController@userLogin');
     Route::post('register', 'Api\UserController@userRegister');
-  
+    
     Route::group([
       'middleware' => 'auth:api'
     ], function() {
-        Route::get('logout', 'Api\UserController@userLogout');
+        Route::post('logout', 'Api\UserController@userLogout');
         Route::post('reclamos','Api\ReclamosController@getReclamos');
     });
 });

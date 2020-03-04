@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
-    private $successStatus  =   200;
+    private $successStatus   =  200;
+    private $unsuccessStatus =  401;
  
     //----------------- [ Register user ] -------------------
     public function userRegister(Request $request) 
@@ -51,51 +53,49 @@ class UserController extends Controller
     }
     // -------------- [ User Login ] -----------------
     public function userLogin(Request $request) {
-        //if (Auth::guard('api')->check()) {
-            // Here you have access to $request->user() method that
-            // contains the model of the currently authenticated user.
-            //
-            // Note that this method should only work if you call it
-            // after an Auth::check(), because the user is set in the
-            // request object by the auth component after a successful
-            // authentication check/retrival
-          //  return response()->json($request->user());
-        //}
-        if (Auth::check()) 
+        
+        $usuario = $request->header('usuario');
+        $password = $request->header('password');
+        
+        if(Auth::attempt(['email' => $usuario, 'password' => $password])) 
         {
-            //$token                  =       $user->getToken('token')->accessToken;
-            $success['success']     =       true;
-            $success['message']     =       "La session ya se encuentra iniciada.";
-           // $success['token']       =       $token;
-            return response()->json(['success' => $success ], $this->successStatus);
-
-        }
-        if(Auth::attempt(['email' => request('usuario'), 'password' => request('password')])) 
-        {
-             
             // getting auth user after auth login
             $user = Auth::user();
- 
             $token                  =       $user->createToken('token')->accessToken;
             $success['success']     =       true;
-            $success['message']     =       "Inicio de sesión correcto.";
+            $success['status']      =       $this->successStatus;
+            $success['message']     =       "Token Generated.";
             $success['token']       =       $token;
             $success['token_type']  =       'Bearer';
- 
-            return response()->json(['success' => $success ], $this->successStatus);
         }
- 
-        else {
-            return response()->json(['error'=>'Unauthorised'], 401);
+        else 
+        {
+            $success['success']     =       false;
+            $success['status']      =       $this->unsuccessStatus;
+            $success['message']     =       "User or Password is incorrect.";
         }
+        return response()->json(['acceso' => $success ], $this->successStatus);
     }
     public function userLogout(Request $request)
     {
-
+        //Revocamos el token
+        try {
             $request->user()->token()->revoke();
-            return response()->json([
-            'message' => 'Sesión finalizada.',
-            "status" => 200 
-            ]);
+        }
+        catch (\Exception $e)
+        {
+            // Almacenamos la información del error.
+            Log::error('MSI-Revocar-Token-: ' . $e->getMessage());
+            //Devolvemos los datos de error
+            $success['success'] = false;
+            $success['status']  = $this->successStatus;
+            $success['message'] = "Error inesperado.";
+            return response()->json(['logout' => $success],$this->successStatus);
+        }
+        //Devolvemos los datos de error.
+        $success['success'] = true;
+        $success['status']  = $this->successStatus;
+        $success['message'] = "Sesión finalizada.";
+        return response()->json(['logout' => $success],$this->successStatus);
     }
 }
